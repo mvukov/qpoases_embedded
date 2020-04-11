@@ -1,5 +1,7 @@
 # qpQOASES embedded
 
+[![CircleCI](https://circleci.com/gh/mvukov/qpoases_embedded.svg?style=svg)](https://circleci.com/gh/mvukov/qpoases_embedded)
+
 This is an unofficial fork of [qpOASES](https://github.com/coin-or/qpOASES)
 QP solver. The starting point was the embedded version of the solver that
 can be found in [ACADO toolkit](https://github.com/acado/acado).
