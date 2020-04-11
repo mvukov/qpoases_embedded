@@ -2318,13 +2318,14 @@ returnValue QProblem::hotstart_determineStepLength(
   /* IV) SET MAXIMUM HOMOTOPY STEPLENGTH */
   tau = tau_new;
 
-  if (BC_status == ST_UNDEFINED)
+  if (BC_status == ST_UNDEFINED) {
     THROWINFOMSG(RET_STEPSIZE_NONPOSITIVE, "Stepsize is %.6e!", tau);
-  else
+  } else {
     THROWINFOMSG(
         RET_STEPSIZE_NONPOSITIVE,
         "Stepsize is %.6e! (BC_idx = %d, BC_isBound = %d, BC_status = %d)", tau,
         BC_idx, BC_isBound, BC_status);
+  }
 
   return SUCCESSFUL_RETURN;
 }
@@ -2431,20 +2432,22 @@ returnValue QProblem::hotstart_performStep(
     /* Add one variable to active set. */
     default:
       if (BC_isBound == true) {
-        if (BC_status == ST_LOWER)
+        if (BC_status == ST_LOWER) {
           THROWINFOMSG(RET_ADD_TO_ACTIVESET, "lower bound no. %d.", BC_idx);
-        else
+        } else {
           THROWINFOMSG(RET_ADD_TO_ACTIVESET, "upper bound no. %d.", BC_idx);
+        }
 
         if (addBound(BC_idx, BC_status, true) != SUCCESSFUL_RETURN)
           return THROWERROR(RET_ADD_TO_ACTIVESET_FAILED);
       } else {
-        if (BC_status == ST_LOWER)
+        if (BC_status == ST_LOWER) {
           THROWINFOMSG(RET_ADD_TO_ACTIVESET, "lower constraint's bound no. %d.",
                        BC_idx);
-        else
+        } else {
           THROWINFOMSG(RET_ADD_TO_ACTIVESET, "upper constraint's bound no. %d.",
                        BC_idx);
+        }
 
         if (addConstraint(BC_idx, BC_status, true) != SUCCESSFUL_RETURN)
           return THROWERROR(RET_ADD_TO_ACTIVESET_FAILED);

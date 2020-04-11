@@ -25,6 +25,7 @@
 #ifndef QPOASES_CONSTANTS_HPP
 #define QPOASES_CONSTANTS_HPP
 
+#include <cstddef>
 #include <limits>
 
 namespace qpoases_embedded {
