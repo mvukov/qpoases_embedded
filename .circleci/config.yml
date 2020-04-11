@@ -11,7 +11,7 @@ jobs:
           command: |
             source /opt/ros/melodic/setup.bash
             catkin init
-            catkin config --cmake-args -DCMAKE_BUILD_TYPE:STRING=Debug
+            catkin config --cmake-args -DPYTHON_EXECUTABLE=$(which python3) -DCMAKE_BUILD_TYPE:STRING=Debug
             catkin build -j2 --no-status
       - run:
           name: Run tests
