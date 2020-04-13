@@ -60,9 +60,18 @@ TEST(TestQpOases, Example1) {
 
   /* Solve first QP. */
   int nWSR = 10;
-  const auto init_success = qp.init(nWSR, printIteration);
-  ASSERT_EQ(init_success, SUCCESSFUL_RETURN);
+  ASSERT_EQ(SUCCESSFUL_RETURN, qp.init(nWSR, printIteration));
   EXPECT_NEAR(-0.0625, qp.getObjVal(), kEqualTolerance);
+
+  const auto& x = qp.getX();
+  const auto& y = qp.getY();
+
+  EXPECT_NEAR(0.5, x[0], kEqualTolerance);
+  EXPECT_NEAR(-1.5, x[1], kEqualTolerance);
+
+  EXPECT_NEAR(1.75, y[0], kEqualTolerance);
+  EXPECT_NEAR(0, y[1], kEqualTolerance);
+  EXPECT_NEAR(0.25, y[2], kEqualTolerance);
 
   /* Setup data of second QP. */
   *g = {1.0, 1.5};
@@ -73,9 +82,15 @@ TEST(TestQpOases, Example1) {
 
   /* Solve second QP. */
   nWSR = 10;
-  const auto hotstart_success = qp.hotstart(nWSR, printIteration);
-  ASSERT_EQ(hotstart_success, SUCCESSFUL_RETURN);
+  ASSERT_EQ(SUCCESSFUL_RETURN, qp.hotstart(nWSR, printIteration));
   EXPECT_NEAR(-1.25, qp.getObjVal(), kEqualTolerance);
+
+  EXPECT_NEAR(0, x[0], kEqualTolerance);
+  EXPECT_NEAR(-1, x[1], kEqualTolerance);
+
+  EXPECT_NEAR(1, y[0], kEqualTolerance);
+  EXPECT_NEAR(1, y[1], kEqualTolerance);
+  EXPECT_NEAR(0, y[2], kEqualTolerance);
 }
 
 }  // namespace qpoases_embedded
