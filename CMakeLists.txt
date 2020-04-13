@@ -54,11 +54,10 @@ if (CATKIN_ENABLE_TESTING)
   add_library(utils src/Utils.cpp)
   target_compile_definitions(utils PRIVATE QPOASES_DEBUG)
 
-  catkin_add_gtest(example1 test/example1.cpp)
-  target_compile_definitions(example1 PRIVATE QPOASES_DEBUG)
-  target_link_libraries(example1 ${PROJECT_NAME} utils)
-
-  catkin_add_gtest(example1b test/example1b.cpp)
-  target_compile_definitions(example1b PRIVATE QPOASES_DEBUG)
-  target_link_libraries(example1b ${PROJECT_NAME} utils)
+  catkin_add_gtest(e2e_tests
+    test/test_example1.cpp
+    test/test_example1b.cpp
+    test/test_main.cpp)
+  target_compile_definitions(e2e_tests PRIVATE QPOASES_DEBUG)
+  target_link_libraries(e2e_tests ${PROJECT_NAME} utils)
 endif()
