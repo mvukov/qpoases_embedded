@@ -52,7 +52,7 @@ static constexpr real_t inf = INFTY;
 #include "qpoases_embedded/hanging_chain_test_data.h"
 
 static constexpr real_t kEqualXTolerance = 1.5e-13;  // for primal variables
-static constexpr real_t kEqualYTolerance = 1.1e-9;   // for dual variables
+static constexpr real_t kEqualYTolerance = 1.6e-9;   // for dual variables
 
 class TestHangingChain : public ::testing::TestWithParam<QpTestData> {};
 
@@ -88,7 +88,7 @@ TEST_P(TestHangingChain, ProcessTestData) {
     EXPECT_STL_VECTORS_NEAR(test_data.y_opt, qp_b.getY(), kEqualYTolerance);
 
     EXPECT_STL_VECTORS_EQ(qp.getX(), qp_b.getX());
-    EXPECT_STL_VECTORS_NEAR(qp.getY(), qp_b.getY(), 1e-13);
+    EXPECT_STL_VECTORS_NEAR(qp.getY(), qp_b.getY(), 1.5e-13);
   }
 }
 

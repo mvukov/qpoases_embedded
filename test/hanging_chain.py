@@ -170,7 +170,7 @@ def main():
   test_data_vector = [
       solve_hanging_chain_qp(num_masses=num_masses,
                              use_contraints=use_contraints)
-      for num_masses in range(10, 100, 10)
+      for num_masses in range(5, 100, 5)
       for use_contraints in [True, False]
   ]
   test_data_vector_strings = ',\n'.join(
