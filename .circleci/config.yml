@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: mvukov/ros-melodic-catkin:latest
+      - image: mvukov/qpoases-embedded-ci:latest
     steps:
       - checkout:
           path: src

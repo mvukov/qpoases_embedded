@@ -54,10 +54,26 @@ if (CATKIN_ENABLE_TESTING)
   add_library(utils src/Utils.cpp)
   target_compile_definitions(utils PRIVATE QPOASES_DEBUG)
 
+  set(GENERATED_INCLUDE_DIR ${PROJECT_BINARY_DIR}/include)
+  set(GENERATED_TEST_DATA_DIR ${GENERATED_INCLUDE_DIR}/${PROJECT_NAME})
+  set(HANGING_CHAIN_DATA_FILE ${GENERATED_TEST_DATA_DIR}/hanging_chain_test_data.h)
+
+  add_custom_command(
+    OUTPUT ${HANGING_CHAIN_DATA_FILE}
+    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/test/hanging_chain.py
+    ARGS ${HANGING_CHAIN_DATA_FILE}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/hanging_chain.py
+    COMMENT "Exporting hanging chain QP test data vectors."
+    VERBATIM
+  )
+
   catkin_add_gtest(e2e_tests
+    ${HANGING_CHAIN_DATA_FILE}
     test/test_example1.cpp
     test/test_example1b.cpp
+    test/test_hanging_chain.cpp
     test/test_main.cpp)
   target_compile_definitions(e2e_tests PRIVATE QPOASES_DEBUG)
+  target_include_directories(e2e_tests PRIVATE ${GENERATED_INCLUDE_DIR})
   target_link_libraries(e2e_tests ${PROJECT_NAME} utils)
 endif()
