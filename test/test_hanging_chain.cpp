@@ -77,15 +77,18 @@ TEST_P(TestHangingChain, ProcessTestData) {
 
   if (test_data.num_constraints == 0) {
     nWSR = 100;
-    QProblemB qp(test_data.num_variables);
-    *qp.getMutableH() = test_data.h;
-    *qp.getMutableG() = test_data.g;
-    *qp.getMutableLb() = test_data.lb;
-    *qp.getMutableUb() = test_data.ub;
-    const auto success = qp.init(nWSR, printIterationB);
+    QProblemB qp_b(test_data.num_variables);
+    *qp_b.getMutableH() = test_data.h;
+    *qp_b.getMutableG() = test_data.g;
+    *qp_b.getMutableLb() = test_data.lb;
+    *qp_b.getMutableUb() = test_data.ub;
+    const auto success = qp_b.init(nWSR, printIterationB);
     EXPECT_EQ(SUCCESSFUL_RETURN, success) << getErrorString(success);
-    EXPECT_STL_VECTORS_NEAR(test_data.x_opt, qp.getX(), kEqualXTolerance);
-    EXPECT_STL_VECTORS_NEAR(test_data.y_opt, qp.getY(), kEqualYTolerance);
+    EXPECT_STL_VECTORS_NEAR(test_data.x_opt, qp_b.getX(), kEqualXTolerance);
+    EXPECT_STL_VECTORS_NEAR(test_data.y_opt, qp_b.getY(), kEqualYTolerance);
+
+    EXPECT_STL_VECTORS_EQ(qp.getX(), qp_b.getX());
+    EXPECT_STL_VECTORS_NEAR(qp.getY(), qp_b.getY(), 1e-13);
   }
 }
 
