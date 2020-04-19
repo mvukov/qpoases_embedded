@@ -89,7 +89,10 @@ TEST_P(TestHangingChain, ProcessTestData) {
   }
 }
 
-INSTANTIATE_TEST_SUITE_P(HangingChainTests, TestHangingChain,
-                         ::testing::ValuesIn(qp_test_data_vectors));
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+INSTANTIATE_TEST_CASE_P(HangingChainTests, TestHangingChain,
+                        ::testing::ValuesIn(qp_test_data_vectors));
+#pragma GCC diagnostic push
 
 }  // namespace qpoases_embedded
