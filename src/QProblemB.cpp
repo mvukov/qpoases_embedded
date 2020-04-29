@@ -341,10 +341,6 @@ returnValue QProblemB::setupCholeskyDecomposition() {
   int i, j, k, ii, jj;
   int nFR = getNFR();
 
-  /* 1) Initialises R with all zeros. */
-  for (i = 0; i < nV; ++i)
-    for (j = 0; j < nV; ++j) R[i * nV + j] = 0.0;
-
   /* 2) Calculate Cholesky decomposition of H (projected to free variables). */
   if (hessianType == HST_IDENTITY) {
     /* if Hessian is identity, so is its Cholesky factor. */

@@ -303,11 +303,7 @@ returnValue QProblem::setupCholeskyDecompositionProjected() {
   int nFR = getNFR();
   int nZ = getNZ();
 
-  /* 1) Initialises R with all zeros. */
-  for (i = 0; i < nV; ++i)
-    for (j = 0; j < nV; ++j) R[i * nV + j] = 0.0;
-
-  /* 2) Calculate Cholesky decomposition of projected Hessian Z'*H*Z. */
+  /* Calculate Cholesky decomposition of projected Hessian Z'*H*Z. */
   if (hessianType == HST_IDENTITY) {
     /* if Hessian is identity, so is its Cholesky factor. */
     for (i = 0; i < nV; ++i) R[i * nV + i] = 1.0;
@@ -443,15 +439,14 @@ returnValue QProblem::setupCholeskyDecompositionProjected() {
  *  s e t u p T Q f a c t o r i s a t i o n
  */
 returnValue QProblem::setupTQfactorisation() {
-  int i, j, ii;
+  int i, ii;
 
   int nFR = getNFR();
 
   const auto& FR_idx = bounds.getFree()->getNumberArray();
 
   /* 1) Set Q to unity matrix. */
-  for (i = 0; i < nV; ++i)
-    for (j = 0; j < nV; ++j) Q[i * nV + j] = 0.0;
+  std::fill(Q.begin(), Q.end(), 0.0);
 
   for (i = 0; i < nFR; ++i) {
     ii = FR_idx[i];
@@ -459,8 +454,7 @@ returnValue QProblem::setupTQfactorisation() {
   }
 
   /* 2) Set T to zero matrix. */
-  for (i = 0; i < sizeT; ++i)
-    for (j = 0; j < sizeT; ++j) T[i * nV + j] = 0.0;
+  std::fill(T.begin(), T.end(), 0.0);
 
   return SUCCESSFUL_RETURN;
 }
