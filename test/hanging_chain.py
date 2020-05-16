@@ -69,6 +69,8 @@ import sys
 import casadi
 import numpy
 
+import common
+
 
 def solve_hanging_chain_qp(num_masses, use_contraints):
   m_i = 40.0 / num_masses
@@ -165,31 +167,15 @@ def get_test_data_string(test_data):
 
 
 def main():
-  numpy.set_printoptions(precision=16)
-
   test_data_vector = [
       solve_hanging_chain_qp(num_masses=num_masses,
                              use_contraints=use_contraints)
       for num_masses in range(5, 100, 5)
       for use_contraints in [True, False]
   ]
-  test_data_vector_strings = ',\n'.join(
-      [get_test_data_string(test_data) for test_data in test_data_vector])
 
-  header = """
-const std::vector<QpTestData> qp_test_data_vectors = {{
-{test_data_vector_strings}
-}};
-""".format(test_data_vector_strings=test_data_vector_strings)
-
-  print(f'Header path: {sys.argv[1]}')
-
-  header_path = sys.argv[1]
-  header_dir = os.path.dirname(header_path)
-  if header_dir and not os.path.exists(header_dir):
-    os.makedirs(header_dir)
-  with open(header_path, 'w') as stream:
-    stream.write(header)
+  header = common.get_test_data_header(test_data_vector)
+  common.write_to_file(header, sys.argv[1])
 
 
 if __name__ == '__main__':

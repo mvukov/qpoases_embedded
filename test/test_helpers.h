@@ -29,6 +29,8 @@
 
 #include <gtest/gtest.h>
 
+#include "qpoases_embedded/Constants.hpp"
+
 #define EXPECT_STL_VECTORS_EQ(lhs, rhs) \
   EXPECT_TRUE(qpoases_embedded::testing::CompareStlVectors(lhs, rhs));
 
@@ -71,6 +73,24 @@ template <typename T>
 }
 
 }  // namespace testing
+
+struct QpTestData {
+  int num_variables;
+  int num_constraints;
+  std::vector<real_t> h;
+  std::vector<real_t> g;
+  std::vector<real_t> a;
+  std::vector<real_t> lb;
+  std::vector<real_t> ub;
+  std::vector<real_t> lba;
+  std::vector<real_t> uba;
+  std::vector<real_t> x_opt;
+  std::vector<real_t> y_opt;
+  real_t f_opt;
+};
+
+static constexpr real_t inf = INFTY;
+
 }  // namespace qpoases_embedded
 
 #endif  // TEST_HELPERS_H_

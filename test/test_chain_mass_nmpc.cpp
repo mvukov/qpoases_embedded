@@ -30,16 +30,17 @@
 
 #include "./test_helpers.h"
 
-#include "qpoases_embedded/hanging_chain_test_data.h"
+#include "qpoases_embedded/chain_mass_nmpc_test_data.h"
 
 namespace qpoases_embedded {
 
-static constexpr real_t kEqualXTolerance = 1.5e-13;  // for primal variables
-static constexpr real_t kEqualYTolerance = 1.6e-9;   // for dual variables
+static constexpr real_t kEqualXTolerance = 1e-12;  // for primal variables
+static constexpr real_t kEqualYTolerance = 1e-11;  // for dual variables
+static constexpr real_t kEqualObjTolerance = 1e-2;
 
-class TestHangingChain : public ::testing::TestWithParam<QpTestData> {};
+class TestChainMassNmpc : public ::testing::TestWithParam<QpTestData> {};
 
-TEST_P(TestHangingChain, ProcessTestData) {
+TEST_P(TestChainMassNmpc, ProcessTestData) {
   const auto& test_data = GetParam();
   ASSERT_GT(test_data.num_variables, 0);
   ASSERT_GE(test_data.num_constraints, 0);
@@ -57,29 +58,14 @@ TEST_P(TestHangingChain, ProcessTestData) {
   EXPECT_EQ(SUCCESSFUL_RETURN, success) << getErrorString(success);
   EXPECT_STL_VECTORS_NEAR(test_data.x_opt, qp.getX(), kEqualXTolerance);
   EXPECT_STL_VECTORS_NEAR(test_data.y_opt, qp.getY(), kEqualYTolerance);
-
-  if (test_data.num_constraints == 0) {
-    nWSR = 100;
-    QProblemB qp_b(test_data.num_variables);
-    *qp_b.getMutableH() = test_data.h;
-    *qp_b.getMutableG() = test_data.g;
-    *qp_b.getMutableLb() = test_data.lb;
-    *qp_b.getMutableUb() = test_data.ub;
-    const auto success = qp_b.init(nWSR, printIterationB);
-    EXPECT_EQ(SUCCESSFUL_RETURN, success) << getErrorString(success);
-    EXPECT_STL_VECTORS_NEAR(test_data.x_opt, qp_b.getX(), kEqualXTolerance);
-    EXPECT_STL_VECTORS_NEAR(test_data.y_opt, qp_b.getY(), kEqualYTolerance);
-
-    EXPECT_STL_VECTORS_EQ(qp.getX(), qp_b.getX());
-    EXPECT_STL_VECTORS_NEAR(qp.getY(), qp_b.getY(), 1.5e-13);
-  }
+  EXPECT_NEAR(test_data.f_opt, qp.getObjVal(), kEqualObjTolerance);
 }
 
 #ifdef INSTANTIATE_TEST_SUITE_P
-INSTANTIATE_TEST_SUITE_P(HangingChainTests, TestHangingChain,
+INSTANTIATE_TEST_SUITE_P(ChainMassNmpcTests, TestChainMassNmpc,
                          ::testing::ValuesIn(qp_test_data_vectors));
 #else
-INSTANTIATE_TEST_CASE_P(HangingChainTests, TestHangingChain,
+INSTANTIATE_TEST_CASE_P(ChainMassNmpcTests, TestChainMassNmpc,
                         ::testing::ValuesIn(qp_test_data_vectors), );
 #endif  // INSTANTIATE_TEST_SUITE_P
 
