@@ -154,18 +154,6 @@ def solve_hanging_chain_qp(num_masses, use_contraints):
           numpy.asarray(ubg), x_opt, y_opt, f_opt)
 
 
-def get_test_data_string(test_data):
-  test_data_str = []
-  for data in test_data:
-    if isinstance(data, numpy.ndarray):
-      flat_data = data.flatten()
-      test_data_str.append('{{{}}}'.format(', '.join(
-          [str(value) for value in flat_data])))
-    else:
-      test_data_str.append(str(data))
-  return '{{{}}}'.format(', '.join(test_data_str))
-
-
 def main():
   test_data_vector = [
       solve_hanging_chain_qp(num_masses=num_masses,
