@@ -5,6 +5,7 @@ cmake_policy(SET CMP0042 NEW)
 project(qpoases_embedded)
 
 find_package(catkin QUIET)
+find_package(benchmark QUIET)
 
 if (catkin_FOUND)
   catkin_package(
@@ -50,12 +51,37 @@ if (catkin_FOUND)
   )
 endif()
 
+set(GENERATED_INCLUDE_DIR ${PROJECT_BINARY_DIR}/include)
+set(GENERATED_TEST_DATA_DIR ${GENERATED_INCLUDE_DIR}/${PROJECT_NAME})
+
+if (benchmark_FOUND)
+  set(CHAIN_MASS_NMPC_BENCHMARK_DATA_FILE
+    ${GENERATED_TEST_DATA_DIR}/chain_mass_nmpc_benchmark_data.h)
+
+  add_custom_command(
+    OUTPUT ${CHAIN_MASS_NMPC_BENCHMARK_DATA_FILE}
+    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/test/chain_mass_nmpc.py
+    ARGS ${CHAIN_MASS_NMPC_BENCHMARK_DATA_FILE}
+    DEPENDS
+      ${CMAKE_CURRENT_SOURCE_DIR}/test/common.py
+      ${CMAKE_CURRENT_SOURCE_DIR}/test/chain_mass_nmpc.py
+    COMMENT "Exporting hanging chain QP benchmark data vectors."
+    VERBATIM
+  )
+
+  add_executable(benchmark_chain_mass_nmpc
+    ${CHAIN_MASS_NMPC_BENCHMARK_DATA_FILE}
+    test/benchmark_chain_mass_nmpc.cpp)
+  target_include_directories(benchmark_chain_mass_nmpc
+    PRIVATE benchmark::benchmark ${GENERATED_INCLUDE_DIR})
+  target_link_libraries(benchmark_chain_mass_nmpc
+    ${PROJECT_NAME} benchmark::benchmark)
+endif()
+
 if (CATKIN_ENABLE_TESTING)
   add_library(utils src/Utils.cpp)
   target_compile_definitions(utils PRIVATE QPOASES_DEBUG)
 
-  set(GENERATED_INCLUDE_DIR ${PROJECT_BINARY_DIR}/include)
-  set(GENERATED_TEST_DATA_DIR ${GENERATED_INCLUDE_DIR}/${PROJECT_NAME})
   set(HANGING_CHAIN_DATA_FILE
     ${GENERATED_TEST_DATA_DIR}/hanging_chain_test_data.h)
   set(CHAIN_MASS_NMPC_DATA_FILE
