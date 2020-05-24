@@ -57,6 +57,19 @@ set(GENERATED_TEST_DATA_DIR ${GENERATED_INCLUDE_DIR}/${PROJECT_NAME})
 if (benchmark_FOUND)
   set(CHAIN_MASS_NMPC_BENCHMARK_DATA_FILE
     ${GENERATED_TEST_DATA_DIR}/chain_mass_nmpc_benchmark_data.h)
+  set(HANGING_CHAIN_BENCHMARK_DATA_FILE
+    ${GENERATED_TEST_DATA_DIR}/hanging_chain_benchmark_data.h)
+
+  add_custom_command(
+    OUTPUT ${HANGING_CHAIN_BENCHMARK_DATA_FILE}
+    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/test/hanging_chain.py
+    ARGS ${HANGING_CHAIN_BENCHMARK_DATA_FILE}
+    DEPENDS
+      ${CMAKE_CURRENT_SOURCE_DIR}/test/common.py
+      ${CMAKE_CURRENT_SOURCE_DIR}/test/hanging_chain.py
+    COMMENT "Exporting hanging chain QP benchmark data vectors."
+    VERBATIM
+  )
 
   add_custom_command(
     OUTPUT ${CHAIN_MASS_NMPC_BENCHMARK_DATA_FILE}
@@ -68,6 +81,14 @@ if (benchmark_FOUND)
     COMMENT "Exporting hanging chain QP benchmark data vectors."
     VERBATIM
   )
+
+  add_executable(benchmark_hanging_chain
+    ${HANGING_CHAIN_BENCHMARK_DATA_FILE}
+    test/benchmark_hanging_chain.cpp)
+  target_include_directories(benchmark_hanging_chain
+    PRIVATE benchmark::benchmark ${GENERATED_INCLUDE_DIR})
+  target_link_libraries(benchmark_hanging_chain
+    ${PROJECT_NAME} benchmark::benchmark)
 
   add_executable(benchmark_chain_mass_nmpc
     ${CHAIN_MASS_NMPC_BENCHMARK_DATA_FILE}

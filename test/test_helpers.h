@@ -29,8 +29,6 @@
 
 #include <gtest/gtest.h>
 
-#include "./qp_test_data.h"
-
 #define EXPECT_STL_VECTORS_EQ(lhs, rhs) \
   EXPECT_TRUE(qpoases_embedded::testing::CompareStlVectors(lhs, rhs));
 

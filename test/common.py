@@ -34,10 +34,31 @@ def get_test_data_header(test_data_vector):
       [get_test_data_string(test_data) for test_data in test_data_vector])
 
   header = """
+#include "qpoases_embedded/Constants.hpp"
+
 namespace qpoases_embedded {{
+
+struct QpTestData {{
+  int num_variables;
+  int num_constraints;
+  std::vector<real_t> h;
+  std::vector<real_t> g;
+  std::vector<real_t> a;
+  std::vector<real_t> lb;
+  std::vector<real_t> ub;
+  std::vector<real_t> lba;
+  std::vector<real_t> uba;
+  std::vector<real_t> x_opt;
+  std::vector<real_t> y_opt;
+  real_t f_opt;
+}};
+
+static constexpr real_t inf = INFTY;
+
 const std::vector<QpTestData> qp_test_data_vectors = {{
 {test_data_vector_strings}
 }};
+
 }} // namespace qpoases_embedded
 """.format(test_data_vector_strings=test_data_vector_strings)
   return header

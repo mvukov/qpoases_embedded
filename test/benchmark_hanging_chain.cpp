@@ -26,71 +26,61 @@
 #include <qpoases_embedded/QProblem.hpp>
 #include <qpoases_embedded/Utils.hpp>
 
-#include "qpoases_embedded/chain_mass_nmpc_benchmark_data.h"
+#include "qpoases_embedded/hanging_chain_benchmark_data.h"
 
 #include "./benchmark_helpers.h"
 
 namespace qpoases_embedded {
 
-void BenchmarkChainMassNmpcQpIteration0(benchmark::State& state) {
+void BenchmarkHangingChainQpCachedIteration0(benchmark::State& state) {
   auto qp_solver = GetQpSolver(state);
   if (!qp_solver) {
     state.SkipWithError("Failed to find QP test data!");
     return;
   }
 
-  static constexpr size_t kNumSolvers = 1000;
-  std::vector<QProblem> qp_solvers(kNumSolvers, *qp_solver);
+  std::vector<double>* qp_x = qp_solver->getMutableX();
+  std::vector<double>* qp_y = qp_solver->getMutableY();
 
-  size_t index = 0;
   for (auto _ : state) {
     state.PauseTiming();
-    auto& current_qp_solver = qp_solvers.at(index);
-    std::vector<double>* qp_x = current_qp_solver.getMutableX();
-    std::vector<double>* qp_y = current_qp_solver.getMutableY();
     std::fill(qp_x->begin(), qp_x->end(), 0);
     std::fill(qp_y->begin(), qp_y->end(), 0);
     state.ResumeTiming();
 
     int nWSR = 100;
-    const auto success = current_qp_solver.init(
-        nWSR, [](int, real_t, int, int, int, SubjectToStatus, bool) {
-          return false;
-        });
+    const auto success =
+        qp_solver->init(nWSR, [](int, real_t, int, int, int, SubjectToStatus,
+                                 bool) { return false; });
     if (success != RET_USER_ABORT_REQUESTED && success != SUCCESSFUL_RETURN) {
       state.SkipWithError("Failed to solve QP!");
       break;
     }
-    index = (index + 1) % kNumSolvers;
   }
 }
 
-BENCHMARK(BenchmarkChainMassNmpcQpIteration0)
+BENCHMARK(BenchmarkHangingChainQpCachedIteration0)
     ->Apply(PrepareBenchmarkArguments)
     ->Unit(::benchmark::kMillisecond)
     ->MinTime(1.0);
 
-void BenchmarkChainMassNmpcQpIteration1(benchmark::State& state) {
+void BenchmarkHangingChainQpCachedIteration1(benchmark::State& state) {
   auto qp_solver = GetQpSolver(state);
   if (!qp_solver) {
     state.SkipWithError("Failed to find QP test data!");
     return;
   }
 
-  static constexpr size_t kNumSolvers = 1000;
-  std::vector<QProblem> qp_solvers(kNumSolvers, *qp_solver);
+  std::vector<double>* qp_x = qp_solver->getMutableX();
+  std::vector<double>* qp_y = qp_solver->getMutableY();
 
-  size_t index = 0;
   for (auto _ : state) {
     state.PauseTiming();
-    auto& current_qp_solver = qp_solvers.at(index);
-    std::vector<double>* qp_x = current_qp_solver.getMutableX();
-    std::vector<double>* qp_y = current_qp_solver.getMutableY();
     std::fill(qp_x->begin(), qp_x->end(), 0);
     std::fill(qp_y->begin(), qp_y->end(), 0);
 
     int nWSR = 100;
-    const auto success = current_qp_solver.init(
+    const auto success = qp_solver->init(
         nWSR,
         [&state](int iteration, real_t, int, int, int, SubjectToStatus, bool) {
           if (iteration == 0) {
@@ -104,11 +94,10 @@ void BenchmarkChainMassNmpcQpIteration1(benchmark::State& state) {
       state.SkipWithError("Failed to solve QP!");
       break;
     }
-    index = (index + 1) % kNumSolvers;
   }
 }
 
-BENCHMARK(BenchmarkChainMassNmpcQpIteration1)
+BENCHMARK(BenchmarkHangingChainQpCachedIteration1)
     ->Apply(PrepareBenchmarkArguments)
     ->Unit(::benchmark::kMillisecond)
     ->MinTime(1.0);
