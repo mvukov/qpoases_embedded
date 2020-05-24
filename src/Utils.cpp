@@ -43,13 +43,13 @@ bool printIterationB(int iteration, real_t tau, int nFX, int BC_idx,
 
   /* 1) Print header. */
   if (iteration % 10 == 0) {
-    printf("   Iter   |   StepLength    |       Info      |   nFX   \n");
+    printf("  Iter  |  StepLength   |     Info      |  nFX   \n");
   }
 
   /* 2) Print iteration line. */
   if (BC_status == ST_UNDEFINED) {
-    printf("   %4.1d   |   %1.5e   |    QP SOLVED    |  %4.1d   \n", iteration,
-           tau, nFX);
+    printf("  %4.1d  |  %1.5e  |   QP SOLVED   | %4.1d   \n", iteration, tau,
+           nFX);
 
   } else {
     char info[8];
@@ -59,8 +59,8 @@ bool printIterationB(int iteration, real_t tau, int nFX, int BC_idx,
     else
       sprintf(info, "ADD BND");
 
-    printf("   %4.1d   |   %1.5e   |   %s%4.1d   |  %4.1d   \n", iteration, tau,
-           info, BC_idx, nFX);
+    printf("  %4.1d  |  %1.5e  |  %s%4.1d  | %4.1d   \n", iteration, tau, info,
+           BC_idx, nFX);
   }
 
   return true;
