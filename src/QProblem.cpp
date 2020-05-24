@@ -307,128 +307,63 @@ returnValue QProblem::setupCholeskyDecompositionProjected() {
   if (hessianType == HST_IDENTITY) {
     /* if Hessian is identity, so is its Cholesky factor. */
     for (i = 0; i < nV; ++i) R[i * nV + i] = 1.0;
-  } else {
-    if (nZ > 0) {
-      const auto& FR_idx = bounds.getFree()->getNumberArray();
-#if 0
-      real_t Hz[nV*nV];
-      real_t ZHz[nV*nV];
+    return SUCCESSFUL_RETURN;
+  }
 
-      /* calculate H*Z */
-      for ( i=0; i<nFR; ++i )
-      {
-        ii = FR_idx[i];
+  if (nZ == 0) {
+    return SUCCESSFUL_RETURN;
+  }
 
-        for ( j=0; j<nZ; ++j )
-        {
-          real_t sum = 0.0;
-          for ( k=0; k<nFR; ++k )
-          {
-            kk = FR_idx[k];
-            sum += H[ii*nV + kk] * Q[kk*nV + j];
-          }
-          Hz[i * nV + j] = sum;
-        }
+  const auto& FR_idx = bounds.getFree()->getNumberArray();
+
+  real_t sum, inv;
+  for (j = 0; j < nZ; ++j) {
+    /* Cache one column of Z. */
+    for (i = 0; i < nV; ++i) ZHz[i] = Q[i * nV + j];
+
+    /* Create one column of the product H * Z. */
+    for (i = 0; i < nFR; ++i) {
+      ii = FR_idx[i];
+
+      sum = 0.0;
+      for (k = 0; k < nFR; ++k) {
+        kk = FR_idx[k];
+        sum += H[ii * nV + kk] * ZHz[kk];
       }
+      Hz[ii] = sum;
+    }
 
-      /* calculate Z'*H*Z */
-      for ( i=0; i<nZ; ++i )
-        for ( j=0; j<nZ; ++j )
-        {
-          real_t sum = 0.0;
-          for ( k=0; k<nFR; ++k )
-          {
-            kk = FR_idx[k];
-            sum += Q[kk*nV + i] * Hz[k*nV + j];
-          }
-          ZHz[i * nV + j] = sum;
-        }
+    /* Create one column of the product Z^T * H * Z. */
+    for (i = j; i < nZ; ++i) ZHz[i] = 0.0;
 
-      /* R'*R = Z'*H*Z */
-      real_t sum, inv;
-
-      for( i=0; i<nZ; ++i )
-      {
-        /* j == i */
-        sum = ZHz[i*nV + i];
-
-        for( k=(i-1); k>=0; --k )
-          sum -= R[k*nV + i] * R[k*nV + i];
-
-        if ( sum > 0.0 )
-        {
-          R[i*nV + i] = sqrt( sum );
-          inv = 1.0 / R[i * nV + i];
-        }
-        else
-        {
-          hessianType = HST_SEMIDEF;
-          return THROWERROR( RET_HESSIAN_NOT_SPD );
-        }
-
-        for( j=(i+1); j<nZ; ++j )
-        {
-          sum = ZHz[j*nV + i];
-
-          for( k=(i-1); k>=0; --k )
-            sum -= R[k*nV + i] * R[k*nV + j];
-
-          R[i*nV + j] = sum * inv;
-        }
+    for (k = 0; k < nFR; ++k) {
+      kk = FR_idx[k];
+      real_t q = Hz[kk];
+      for (i = j; i < nZ; ++i) {
+        ZHz[i] += Q[kk * nV + i] * q;
       }
-#else
+    }
 
-      real_t sum, inv;
-      for (j = 0; j < nZ; ++j) {
-        /* Cache one column of Z. */
-        for (i = 0; i < nV; ++i) ZHz[i] = Q[i * nV + j];
+    /* Use the computed column to update the factorization. */
+    /* j == i */
+    sum = ZHz[j];
 
-        /* Create one column of the product H * Z. */
-        for (i = 0; i < nFR; ++i) {
-          ii = FR_idx[i];
+    for (k = (j - 1); k >= 0; --k) sum -= R[k * nV + j] * R[k * nV + j];
 
-          sum = 0.0;
-          for (k = 0; k < nFR; ++k) {
-            kk = FR_idx[k];
-            sum += H[ii * nV + kk] * ZHz[kk];
-          }
-          Hz[ii] = sum;
-        }
+    if (sum > 0.0) {
+      R[j * nV + j] = sqrt(sum);
+      inv = 1.0 / R[j * nV + j];
+    } else {
+      hessianType = HST_SEMIDEF;
+      return THROWERROR(RET_HESSIAN_NOT_SPD);
+    }
 
-        /* Create one column of the product Z^T * H * Z. */
-        for (i = j; i < nZ; ++i) ZHz[i] = 0.0;
+    for (i = (j + 1); i < nZ; ++i) {
+      sum = ZHz[i];
 
-        for (k = 0; k < nFR; ++k) {
-          kk = FR_idx[k];
-          real_t q = Hz[kk];
-          for (i = j; i < nZ; ++i) {
-            ZHz[i] += Q[kk * nV + i] * q;
-          }
-        }
+      for (k = (j - 1); k >= 0; --k) sum -= R[k * nV + j] * R[k * nV + i];
 
-        /* Use the computed column to update the factorization. */
-        /* j == i */
-        sum = ZHz[j];
-
-        for (k = (j - 1); k >= 0; --k) sum -= R[k * nV + j] * R[k * nV + j];
-
-        if (sum > 0.0) {
-          R[j * nV + j] = sqrt(sum);
-          inv = 1.0 / R[j * nV + j];
-        } else {
-          hessianType = HST_SEMIDEF;
-          return THROWERROR(RET_HESSIAN_NOT_SPD);
-        }
-
-        for (i = (j + 1); i < nZ; ++i) {
-          sum = ZHz[i];
-
-          for (k = (j - 1); k >= 0; --k) sum -= R[k * nV + j] * R[k * nV + i];
-
-          R[j * nV + i] = sum * inv;
-        }
-      }
-#endif
+      R[j * nV + i] = sum * inv;
     }
   }
 
