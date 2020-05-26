@@ -1071,13 +1071,20 @@ returnValue QProblemB::hotstart_performStep(
     for (i = 0; i < nFX; ++i) {
       ii = FX_idx[i];
       x[ii] += tau * delta_xFX[i];
+    }
+    for (i = 0; i < nFX; ++i) {
+      ii = FX_idx[i];
       y[ii] += tau * delta_yFX[i];
     }
 
     /* 2) Shift QP data. */
     for (i = 0; i < nV; ++i) {
       g[i] += tau * delta_g[i];
+    }
+    for (i = 0; i < nV; ++i) {
       lb[i] += tau * delta_lb[i];
+    }
+    for (i = 0; i < nV; ++i) {
       ub[i] += tau * delta_ub[i];
     }
   } else {

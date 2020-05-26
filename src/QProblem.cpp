@@ -83,10 +83,6 @@ void QProblem::reset() {
   /* 2) Reset constraints. */
   constraints.reset();
   auxiliaryConstraints.reset();
-
-  /* 3) Reset TQ factorisation. */
-  std::fill(T.begin(), T.end(), 0);
-  std::fill(Q.begin(), Q.end(), 0);
 }
 
 /*
@@ -1796,14 +1792,11 @@ returnValue QProblem::hotstart_determineStepDirection(
   int nZ = getNZ();
 
   /* initialise auxiliary vectors */
-  for (i = 0; i < nFR; ++i) {
-    delta_xFR[i] = 0.0;
-    HMX_delta_xFX[i] = 0.0;
-    YFR_delta_xFRy[i] = 0.0;
-    ZFR_delta_xFRz[i] = 0.0;
-    HFR_YFR_delta_xFRy[i] = 0.0;
-  }
-
+  for (i = 0; i < nFR; ++i) delta_xFR[i] = 0.0;
+  for (i = 0; i < nFR; ++i) HMX_delta_xFX[i] = 0.0;
+  for (i = 0; i < nFR; ++i) YFR_delta_xFRy[i] = 0.0;
+  for (i = 0; i < nFR; ++i) ZFR_delta_xFRz[i] = 0.0;
+  for (i = 0; i < nFR; ++i) HFR_YFR_delta_xFRy[i] = 0.0;
   for (i = 0; i < nZ; ++i) delta_xFRz[i] = 0.0;
 
   /* I) DETERMINE delta_xFX */
@@ -2297,6 +2290,9 @@ returnValue QProblem::hotstart_performStep(
     for (i = 0; i < nFX; ++i) {
       ii = FX_idx[i];
       x[ii] += tau * delta_xFX[i];
+    }
+    for (i = 0; i < nFX; ++i) {
+      ii = FX_idx[i];
       y[ii] += tau * delta_yFX[i];
     }
 
@@ -2320,12 +2316,17 @@ returnValue QProblem::hotstart_performStep(
     /* 2) Shift QP data. */
     for (i = 0; i < nV; ++i) {
       g[i] += tau * delta_g[i];
+    }
+    for (i = 0; i < nV; ++i) {
       lb[i] += tau * delta_lb[i];
+    }
+    for (i = 0; i < nV; ++i) {
       ub[i] += tau * delta_ub[i];
     }
-
     for (i = 0; i < nC; ++i) {
       lbA[i] += tau * delta_lbA[i];
+    }
+    for (i = 0; i < nC; ++i) {
       ubA[i] += tau * delta_ubA[i];
     }
   } else {
