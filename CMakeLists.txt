@@ -4,15 +4,7 @@ cmake_policy(SET CMP0042 NEW)
 
 project(qpoases_embedded)
 
-find_package(catkin QUIET)
 find_package(benchmark QUIET)
-
-if (catkin_FOUND)
-  catkin_package(
-    INCLUDE_DIRS include
-    LIBRARIES ${PROJECT_NAME}
-  )
-endif()
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -40,16 +32,15 @@ if (QPOASES_DEBUG)
   target_compile_definitions(${PROJECT_NAME} PRIVATE QPOASES_DEBUG)
 endif()
 
-if (catkin_FOUND)
-  install(DIRECTORY include/${PROJECT_NAME}/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  )
-  install(TARGETS ${PROJECT_NAME}
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
-endif()
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION include/${PROJECT_NAME}
+	PATTERN include/qpoases_embedded/Utils.* EXCLUDE
+)
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 set(GENERATED_INCLUDE_DIR ${PROJECT_BINARY_DIR}/include)
 set(GENERATED_TEST_DATA_DIR ${GENERATED_INCLUDE_DIR}/${PROJECT_NAME})
@@ -99,7 +90,10 @@ if (benchmark_FOUND)
     ${PROJECT_NAME} benchmark::benchmark)
 endif()
 
-if (CATKIN_ENABLE_TESTING)
+if (BUILD_TESTING)
+  enable_testing()
+  find_package(GTest)
+
   add_library(utils src/Utils.cpp)
   target_compile_definitions(utils PRIVATE QPOASES_DEBUG)
 
@@ -130,15 +124,17 @@ if (CATKIN_ENABLE_TESTING)
     VERBATIM
   )
 
-  catkin_add_gtest(e2e_tests
+  add_executable(e2e_tests
     ${CHAIN_MASS_NMPC_DATA_FILE}
     ${HANGING_CHAIN_DATA_FILE}
     test/test_chain_mass_nmpc.cpp
     test/test_example1.cpp
     test/test_example1b.cpp
-    test/test_hanging_chain.cpp
-    test/test_main.cpp)
+    test/test_hanging_chain.cpp)
   target_compile_definitions(e2e_tests PRIVATE QPOASES_DEBUG)
   target_include_directories(e2e_tests PRIVATE ${GENERATED_INCLUDE_DIR})
-  target_link_libraries(e2e_tests ${PROJECT_NAME} utils)
+  target_link_libraries(e2e_tests ${PROJECT_NAME} utils GTest::Main)
+  add_test(
+    NAME qpoases_embedded_tests
+    COMMAND e2e_tests)
 endif()

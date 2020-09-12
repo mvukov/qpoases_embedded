@@ -7,16 +7,8 @@ jobs:
       - checkout:
           path: src
       - run:
-          name: Build workspace
+          name: Build & Test
           command: |
-            source /opt/ros/melodic/setup.bash
-            catkin init
-            catkin config --cmake-args -DPYTHON_EXECUTABLE=$(which python3) -DCMAKE_BUILD_TYPE:STRING=Debug
-            catkin build -j2 --no-status
-      - run:
-          name: Run tests
-          command: |
-            source /opt/ros/melodic/setup.bash
-            source devel/setup.bash
-            catkin run_tests qpoases_embedded -j1 --no-deps --no-status
-            catkin_test_results build
+            colcon build --event-handlers status- console_cohesion+ --cmake-args -DBUILD_TESTING:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Debug
+            colcon test --event-handlers status- console_cohesion+
+            colcon test-result --all
