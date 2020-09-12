@@ -34,7 +34,7 @@ endif()
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION include/${PROJECT_NAME}
-	PATTERN include/qpoases_embedded/Utils.* EXCLUDE
+  PATTERN include/qpoases_embedded/Utils.* EXCLUDE
 )
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION lib
