@@ -1495,8 +1495,6 @@ returnValue QProblem::removeConstraint(int number, bool updateCholesky) {
  *  r e m o v e B o u n d
  */
 returnValue QProblem::removeBound(int number, bool updateCholesky) {
-  int i, j, ii, jj;
-
   /* consistency checks */
   if (bounds.getStatus(number) == ST_INACTIVE)
     return THROWERROR(RET_BOUND_NOT_ACTIVE);
@@ -1508,11 +1506,10 @@ returnValue QProblem::removeBound(int number, bool updateCholesky) {
   }
 
   /* some definitions */
-  int nFR = getNFR();
-  int nAC = getNAC();
-  int nZ = getNZ();
-
-  int tcol = sizeT - nAC;
+  const int nFR = getNFR();
+  const int nAC = getNAC();
+  const int nZ = getNZ();
+  const int tcol = sizeT - nAC;
 
   /* I) UPDATE INDICES */
   if (bounds.moveFixedToFree(number) != SUCCESSFUL_RETURN)
@@ -1522,8 +1519,8 @@ returnValue QProblem::removeBound(int number, bool updateCholesky) {
 
   /* I) APPEND <nFR+1>th UNITY VECOTR TO Q. */
   int nnFRp1 = FR_idx[nFR];
-  for (i = 0; i < nFR; ++i) {
-    ii = FR_idx[i];
+  for (int i = 0; i < nFR; ++i) {
+    const int ii = FR_idx[i];
     Q[ii * nV + nFR] = 0.0;
     Q[nnFRp1 * nV + i] = 0.0;
   }
@@ -1534,8 +1531,8 @@ returnValue QProblem::removeBound(int number, bool updateCholesky) {
      * to the left and appending a */
     const auto& AC_idx = constraints.getActive()->getNumberArray();
 
-    for (i = 0; i < nAC; ++i) {
-      ii = AC_idx[i];
+    for (int i = 0; i < nAC; ++i) {
+      const int ii = AC_idx[i];
       tmp[i] = A[ii * nV + number];
     }
 
@@ -1544,16 +1541,16 @@ returnValue QProblem::removeBound(int number, bool updateCholesky) {
      *     of T = [T A(:,number)], simultanenous change of Q (i.e. Y and Z). */
     real_t c, s;
 
-    for (j = (nAC - 1); j >= 0; --j) {
+    for (int j = (nAC - 1); j >= 0; --j) {
       computeGivens(tmp[nAC - 1 - j], T[(nAC - 1 - j) * nV + tcol + j],
                     T[(nAC - 1 - j) * nV + tcol + j], tmp[nAC - 1 - j], c, s);
 
-      for (i = (nAC - j); i < nAC; ++i)
+      for (int i = (nAC - j); i < nAC; ++i)
         applyGivens(c, s, tmp[i], T[i * nV + tcol + j], T[i * nV + tcol + j],
                     tmp[i]);
 
-      for (i = 0; i <= nFR; ++i) {
-        ii = FR_idx[i];
+      for (int i = 0; i <= nFR; ++i) {
+        const int ii = FR_idx[i];
         /* nZ+1+nAC = nFR+1  /  nZ+(1) = nZ+1 */
         applyGivens(c, s, Q[ii * nV + nZ + 1 + j], Q[ii * nV + nZ + j],
                     Q[ii * nV + nZ + 1 + j], Q[ii * nV + nZ + j]);
@@ -1569,26 +1566,26 @@ returnValue QProblem::removeBound(int number, bool updateCholesky) {
     real_t rho2 = H[nnFRp1 * nV + nnFRp1] * z2 * z2; /* rho2 = h2*z2*z2 */
 
     if (nFR > 0) {
-      for (i = 0; i < nFR; ++i) Hz[i] = 0.0;
+      for (int i = 0; i < nFR; ++i) Hz[i] = 0.0;
       /* 1) Calculate R'*r = Zfr'*Hfr*z1 + z2*Zfr'*h1 =: Zfr'*Hz + z2*Zfr'*h1 =:
        * rhs and rho2 = z1'*Hfr*z1 + 2*z2*h1'*z1 + h2*z2^2 - r'*r =: z1'*Hz +
        * 2*z2*h1'*z1 + h2*z2^2 - r'r */
-      for (j = 0; j < nFR; ++j) {
-        jj = FR_idx[j];
-        for (i = 0; i < nFR; ++i) {
-          ii = FR_idx[i];
+      for (int j = 0; j < nFR; ++j) {
+        const int jj = FR_idx[j];
+        for (int i = 0; i < nFR; ++i) {
+          const int ii = FR_idx[i];
           /*         H * z1 */
           Hz[i] += H[jj * nV + ii] * Q[jj * nV + nZ];
         }
       }
 
       if (nZ > 0) {
-        for (i = 0; i < nZ; ++i) rhs[i] = 0.0;
+        for (int i = 0; i < nZ; ++i) rhs[i] = 0.0;
 
         /* 2) Calculate rhs. */
-        for (j = 0; j < nFR; ++j) {
-          jj = FR_idx[j];
-          for (i = 0; i < nZ; ++i) /* Zfr' * ( Hz + z2*h1 ) */
+        for (int j = 0; j < nFR; ++j) {
+          const int jj = FR_idx[j];
+          for (int i = 0; i < nZ; ++i) /* Zfr' * ( Hz + z2*h1 ) */
             rhs[i] += Q[jj * nV + i] * (Hz[j] + z2 * H[nnFRp1 * nV + jj]);
         }
 
@@ -1598,14 +1595,14 @@ returnValue QProblem::removeBound(int number, bool updateCholesky) {
 
         /* 4) Calculate rho2 = rho^2 = z'*Hz - r'*r
          *    and store r into R. */
-        for (i = 0; i < nZ; ++i) {
+        for (int i = 0; i < nZ; ++i) {
           rho2 -= r[i] * r[i];
           R[i * nV + nZ] = r[i];
         }
       }
 
-      for (j = 0; j < nFR; ++j) {
-        jj = FR_idx[j];
+      for (int j = 0; j < nFR; ++j) {
+        const int jj = FR_idx[j];
         /* z1' * ( Hz + 2*z2*h1 ) */
         rho2 += Q[jj * nV + nZ] * (Hz[j] + 2.0 * z2 * H[nnFRp1 * nV + jj]);
       }
@@ -1730,8 +1727,6 @@ returnValue QProblem::hotstart_determineDataShift(
     real_t* const delta_g, real_t* const delta_lbA, real_t* const delta_ubA,
     real_t* const delta_lb, real_t* const delta_ub, bool& Delta_bC_isZero,
     bool& Delta_bB_isZero) {
-  int i, ii;
-
   int nAC = getNAC();
 
   /* I) DETERMINE DATA SHIFT FOR BOUNDS */
@@ -1740,7 +1735,7 @@ returnValue QProblem::hotstart_determineDataShift(
 
   /* II) DETERMINE DATA SHIFT FOR CONSTRAINTS */
   /* 1) Calculate shift directions. */
-  for (i = 0; i < nC; ++i) {
+  for (int i = 0; i < nC; ++i) {
     /* if lower constraints' bounds do not exist, shift them to -infinity */
     if (lbA_new != 0)
       delta_lbA[i] = lbA_new[i] - lbA[i];
@@ -1748,7 +1743,7 @@ returnValue QProblem::hotstart_determineDataShift(
       delta_lbA[i] = -INFTY - lbA[i];
   }
 
-  for (i = 0; i < nC; ++i) {
+  for (int i = 0; i < nC; ++i) {
     /* if upper constraints' bounds do not exist, shift them to infinity */
     if (ubA_new != 0)
       delta_ubA[i] = ubA_new[i] - ubA[i];
@@ -1759,8 +1754,8 @@ returnValue QProblem::hotstart_determineDataShift(
   /* 2) Determine if active constraints' bounds are to be shifted. */
   Delta_bC_isZero = true;
 
-  for (i = 0; i < nAC; ++i) {
-    ii = AC_idx[i];
+  for (int i = 0; i < nAC; ++i) {
+    const int ii = AC_idx[i];
 
     if ((std::fabs(delta_lbA[ii]) > EPS) || (std::fabs(delta_ubA[ii]) > EPS)) {
       Delta_bC_isZero = false;

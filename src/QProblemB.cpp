@@ -779,31 +779,30 @@ returnValue QProblemB::hotstart_determineDataShift(
     const real_t* const lb_new, const real_t* const ub_new,
     real_t* const delta_g, real_t* const delta_lb, real_t* const delta_ub,
     bool& Delta_bB_isZero) {
-  int i, ii;
-  int nFX = getNFX();
+  const int nFX = getNFX();
 
   /* 1) Calculate shift directions. */
-  for (i = 0; i < nV; ++i) delta_g[i] = g_new[i] - g[i];
+  for (int i = 0; i < nV; ++i) delta_g[i] = g_new[i] - g[i];
 
   if (lb_new != 0) {
-    for (i = 0; i < nV; ++i) delta_lb[i] = lb_new[i] - lb[i];
+    for (int i = 0; i < nV; ++i) delta_lb[i] = lb_new[i] - lb[i];
   } else {
     /* if no lower bounds exist, assume the new lower bounds to be -infinity */
-    for (i = 0; i < nV; ++i) delta_lb[i] = -INFTY - lb[i];
+    for (int i = 0; i < nV; ++i) delta_lb[i] = -INFTY - lb[i];
   }
 
   if (ub_new != 0) {
-    for (i = 0; i < nV; ++i) delta_ub[i] = ub_new[i] - ub[i];
+    for (int i = 0; i < nV; ++i) delta_ub[i] = ub_new[i] - ub[i];
   } else {
     /* if no upper bounds exist, assume the new upper bounds to be infinity */
-    for (i = 0; i < nV; ++i) delta_ub[i] = INFTY - ub[i];
+    for (int i = 0; i < nV; ++i) delta_ub[i] = INFTY - ub[i];
   }
 
   /* 2) Determine if active bounds are to be shifted. */
   Delta_bB_isZero = true;
 
-  for (i = 0; i < nFX; ++i) {
-    ii = FX_idx[i];
+  for (int i = 0; i < nFX; ++i) {
+    const int ii = FX_idx[i];
 
     if ((std::fabs(delta_lb[ii]) > EPS) || (std::fabs(delta_ub[ii]) > EPS)) {
       Delta_bB_isZero = false;
