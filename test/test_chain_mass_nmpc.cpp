@@ -61,12 +61,7 @@ TEST_P(TestChainMassNmpc, ProcessTestData) {
   EXPECT_NEAR(test_data.f_opt, qp.getObjVal(), kEqualObjTolerance);
 }
 
-#ifdef INSTANTIATE_TEST_SUITE_P
 INSTANTIATE_TEST_SUITE_P(ChainMassNmpcTests, TestChainMassNmpc,
                          ::testing::ValuesIn(qp_test_data_vectors));
-#else
-INSTANTIATE_TEST_CASE_P(ChainMassNmpcTests, TestChainMassNmpc,
-                        ::testing::ValuesIn(qp_test_data_vectors), );
-#endif  // INSTANTIATE_TEST_SUITE_P
 
 }  // namespace qpoases_embedded

@@ -63,7 +63,6 @@ minimize {y, z} Vchain(y, z)
 subject to: z_i >= zin
             z_i - 0.1*y_i >= 0.5
 """
-import os
 import sys
 
 import casadi
@@ -92,11 +91,6 @@ def solve_hanging_chain_qp(num_masses, use_contraints):
 
   # Loop over all chain elements
   for i in range(0, num_masses):
-    # Previous point
-    if i > 0:
-      y_prev = y_i
-      z_prev = z_i
-
     # Create variables for the (y_i, z_i) coordinates
     y_i = casadi.SX.sym('y_' + str(i))
     z_i = casadi.SX.sym('z_' + str(i))
@@ -121,6 +115,10 @@ def solve_hanging_chain_qp(num_masses, use_contraints):
       g.append(z_i - 0.1 * y_i)
       lbg.append(0.5)
       ubg.append(numpy.inf)
+
+    # Prepare for the next iteration
+    y_prev = y_i
+    z_prev = z_i
 
   f += D_i / 2 * ((y_i - y_end)**2 + (z_i - z_end)**2)
 

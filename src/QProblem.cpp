@@ -370,17 +370,15 @@ returnValue QProblem::setupCholeskyDecompositionProjected() {
  *  s e t u p T Q f a c t o r i s a t i o n
  */
 returnValue QProblem::setupTQfactorisation() {
-  int i, ii;
-
-  int nFR = getNFR();
+  const int nFR = getNFR();
 
   const auto& FR_idx = bounds.getFree()->getNumberArray();
 
   /* 1) Set Q to unity matrix. */
   std::fill(Q.begin(), Q.end(), 0.0);
 
-  for (i = 0; i < nFR; ++i) {
-    ii = FR_idx[i];
+  for (int i = 0; i < nFR; ++i) {
+    const int ii = FR_idx[i];
     Q[ii * nV + i] = 1.0;
   }
 
@@ -1378,8 +1376,6 @@ returnValue QProblem::addBound_ensureLI(int number, SubjectToStatus B_status) {
  *  r e m o v e C o n s t r a i n t
  */
 returnValue QProblem::removeConstraint(int number, bool updateCholesky) {
-  int i, j, ii, jj;
-
   /* consistency check */
   if ((getStatus() == QPS_NOTINITIALISED) ||
       (getStatus() == QPS_AUXILIARYQPSOLVED) ||
@@ -1408,61 +1404,61 @@ returnValue QProblem::removeConstraint(int number, bool updateCholesky) {
    *    i.e. shift rows number+1 through nAC  upwards (instead of the actual
    *    constraint number its corresponding index within matrix A is used). */
   if (number_idx < nAC - 1) {
-    for (i = (number_idx + 1); i < nAC; ++i)
-      for (j = (nAC - i - 1); j < nAC; ++j)
+    for (int i = (number_idx + 1); i < nAC; ++i)
+      for (int j = (nAC - i - 1); j < nAC; ++j)
         T[(i - 1) * nV + tcol + j] = T[i * nV + tcol + j];
     /* gimmick: write zeros into the last row of T */
-    for (j = 0; j < nAC; ++j) T[(nAC - 1) * nV + tcol + j] = 0.0;
+    for (int j = 0; j < nAC; ++j) T[(nAC - 1) * nV + tcol + j] = 0.0;
 
     /* II) RESTORE TRIANGULAR FORM OF T,
      *     use column-wise Givens rotations to restore reverse triangular form
      *     of T simultanenous change of Q (i.e. Y). */
     real_t c, s;
 
-    for (j = (nAC - 2 - number_idx); j >= 0; --j) {
+    for (int j = (nAC - 2 - number_idx); j >= 0; --j) {
       computeGivens(T[(nAC - 2 - j) * nV + tcol + 1 + j],
                     T[(nAC - 2 - j) * nV + tcol + j],
                     T[(nAC - 2 - j) * nV + tcol + 1 + j],
                     T[(nAC - 2 - j) * nV + tcol + j], c, s);
 
-      for (i = (nAC - j - 1); i < (nAC - 1); ++i)
+      for (int i = (nAC - j - 1); i < (nAC - 1); ++i)
         applyGivens(c, s, T[i * nV + tcol + 1 + j], T[i * nV + tcol + j],
                     T[i * nV + tcol + 1 + j], T[i * nV + tcol + j]);
 
-      for (i = 0; i < nFR; ++i) {
-        ii = FR_idx[i];
+      for (int i = 0; i < nFR; ++i) {
+        const int ii = FR_idx[i];
         applyGivens(c, s, Q[ii * nV + nZ + 1 + j], Q[ii * nV + nZ + j],
                     Q[ii * nV + nZ + 1 + j], Q[ii * nV + nZ + j]);
       }
     }
   } else {
     /* gimmick: write zeros into the last row of T */
-    for (j = 0; j < nAC; ++j) T[(nAC - 1) * nV + tcol + j] = 0.0;
+    for (int j = 0; j < nAC; ++j) T[(nAC - 1) * nV + tcol + j] = 0.0;
   }
 
   if ((updateCholesky == true) && (hessianType != HST_IDENTITY)) {
     /* III) UPDATE CHOLESKY DECOMPOSITION,
      *      calculate new additional column (i.e. [r sqrt(rho2)]')
      *      of the Cholesky factor R. */
-    for (i = 0; i < nFR; ++i) Hz[i] = 0.0;
+    for (int i = 0; i < nFR; ++i) Hz[i] = 0.0;
     real_t rho2 = 0.0;
 
     /* 1) Calculate Hz = H*z, where z is the new rightmost column of Z
      *    (i.e. the old leftmost column of Y).  */
-    for (j = 0; j < nFR; ++j) {
-      jj = FR_idx[j];
-      for (i = 0; i < nFR; ++i)
+    for (int j = 0; j < nFR; ++j) {
+      const int jj = FR_idx[j];
+      for (int i = 0; i < nFR; ++i)
         Hz[i] += H[jj * nV + FR_idx[i]] * Q[jj * nV + nZ];
     }
 
     if (nZ > 0) {
-      for (i = 0; i < nZ; ++i) ZHz[i] = 0.0;
+      for (int i = 0; i < nZ; ++i) ZHz[i] = 0.0;
 
       /* 2) Calculate ZHz = Z'*Hz (old Z). */
-      for (j = 0; j < nFR; ++j) {
-        jj = FR_idx[j];
+      for (int j = 0; j < nFR; ++j) {
+        const int jj = FR_idx[j];
 
-        for (i = 0; i < nZ; ++i) ZHz[i] += Q[jj * nV + i] * Hz[j];
+        for (int i = 0; i < nZ; ++i) ZHz[i] += Q[jj * nV + i] * Hz[j];
       }
 
       /* 3) Calculate r = R^-T * ZHz. */
@@ -1471,13 +1467,13 @@ returnValue QProblem::removeConstraint(int number, bool updateCholesky) {
 
       /* 4) Calculate rho2 = rho^2 = z'*Hz - r'*r
        *    and store r into R. */
-      for (i = 0; i < nZ; ++i) {
+      for (int i = 0; i < nZ; ++i) {
         rho2 -= r[i] * r[i];
         R[i * nV + nZ] = r[i];
       }
     }
 
-    for (j = 0; j < nFR; ++j) rho2 += Q[FR_idx[j] * nV + nZ] * Hz[j];
+    for (int j = 0; j < nFR; ++j) rho2 += Q[FR_idx[j] * nV + nZ] * Hz[j];
 
     /* 5) Store rho into R. */
     if (rho2 > 0.0)
@@ -2264,12 +2260,10 @@ returnValue QProblem::hotstart_performStep(
     const real_t* const delta_yAC, const real_t* const delta_yFX,
     const real_t* const delta_Ax, int BC_idx, SubjectToStatus BC_status,
     bool BC_isBound) {
-  int i, j, ii;
-
-  int nFR = getNFR();
-  int nFX = getNFX();
-  int nAC = getNAC();
-  int nIAC = getNIAC();
+  const int nFR = getNFR();
+  const int nFX = getNFX();
+  const int nAC = getNAC();
+  const int nIAC = getNIAC();
 
   /* I) CHECK (CONSTRAINTS') BOUNDS' CONSISTENCY */
   if (areBoundsConsistent(delta_lb, delta_ub, delta_lbA, delta_ubA) == false) {
@@ -2282,51 +2276,51 @@ returnValue QProblem::hotstart_performStep(
   /* II) GO TO ACTIVE SET CHANGE */
   if (tau > ZERO) {
     /* 1) Perform step in primal und dual space... */
-    for (i = 0; i < nFR; ++i) {
-      ii = FR_idx[i];
+    for (int i = 0; i < nFR; ++i) {
+      const int ii = FR_idx[i];
       x[ii] += tau * delta_xFR[i];
     }
 
-    for (i = 0; i < nFX; ++i) {
-      ii = FX_idx[i];
+    for (int i = 0; i < nFX; ++i) {
+      const int ii = FX_idx[i];
       x[ii] += tau * delta_xFX[i];
     }
-    for (i = 0; i < nFX; ++i) {
-      ii = FX_idx[i];
+    for (int i = 0; i < nFX; ++i) {
+      const int ii = FX_idx[i];
       y[ii] += tau * delta_yFX[i];
     }
 
-    for (i = 0; i < nAC; ++i) {
-      ii = AC_idx[i];
+    for (int i = 0; i < nAC; ++i) {
+      const int ii = AC_idx[i];
       y[nV + ii] += tau * delta_yAC[i];
     }
 
     /* ... also for Ax. */
-    for (i = 0; i < nIAC; ++i) {
-      ii = IAC_idx[i];
+    for (int i = 0; i < nIAC; ++i) {
+      const int ii = IAC_idx[i];
       if (constraints.getType(ii) != ST_UNBOUNDED) Ax[ii] += tau * delta_Ax[ii];
     }
-    for (i = 0; i < nAC; ++i) {
-      ii = AC_idx[i];
+    for (int i = 0; i < nAC; ++i) {
+      const int ii = AC_idx[i];
 
       Ax[ii] = 0.0;
-      for (j = 0; j < nV; ++j) Ax[ii] += A[ii * nV + j] * x[j];
+      for (int j = 0; j < nV; ++j) Ax[ii] += A[ii * nV + j] * x[j];
     }
 
     /* 2) Shift QP data. */
-    for (i = 0; i < nV; ++i) {
+    for (int i = 0; i < nV; ++i) {
       g[i] += tau * delta_g[i];
     }
-    for (i = 0; i < nV; ++i) {
+    for (int i = 0; i < nV; ++i) {
       lb[i] += tau * delta_lb[i];
     }
-    for (i = 0; i < nV; ++i) {
+    for (int i = 0; i < nV; ++i) {
       ub[i] += tau * delta_ub[i];
     }
-    for (i = 0; i < nC; ++i) {
+    for (int i = 0; i < nC; ++i) {
       lbA[i] += tau * delta_lbA[i];
     }
-    for (i = 0; i < nC; ++i) {
+    for (int i = 0; i < nC; ++i) {
       ubA[i] += tau * delta_ubA[i];
     }
   } else {

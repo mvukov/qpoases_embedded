@@ -38,7 +38,7 @@ class SubjectTo {
    */
  public:
   SubjectTo() = delete;
-  SubjectTo(int size);
+  explicit SubjectTo(int size);
 
   void reset();
 

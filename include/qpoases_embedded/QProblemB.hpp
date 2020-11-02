@@ -55,7 +55,7 @@ class QProblemB {
 
   QProblemB() = delete;
   /** Constructor which takes the QP dimension only. */
-  QProblemB(size_t _nV /**< Number of variables. */);
+  explicit QProblemB(size_t _nV /**< Number of variables. */);
 
   /** Clears all data structures of QProblemB except for QP data. */
   void reset();
@@ -285,12 +285,13 @@ class QProblemB {
    matrix. \n
    *  Special variant for the case that this function is called from within
    "removeBound()". *  \return SUCCESSFUL_RETURN \n RET_DIV_BY_ZERO */
-  returnValue backsolveR(const real_t* const b, /**< Right hand side vector. */
-                         bool transposed,       /**< Indicates if the transposed
-                                                   system       shall be solved. */
-                         bool removingBound,    /**< Indicates if function is
-                                                   called    from "removeBound()". */
-                         real_t* const a        /**< Output: Solution vector */
+  returnValue backsolveR(
+      const real_t* const b, /**< Right hand side vector. */
+      bool transposed,       /**< Indicates if the transposed
+                                system       shall be solved. */
+      bool removingBound,    /**< Indicates if function is
+                                called    from "removeBound()". */
+      real_t* const a        /**< Output: Solution vector */
   );
 
   /** Determines step direction of the shift of the QP data.

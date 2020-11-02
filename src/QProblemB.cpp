@@ -671,8 +671,7 @@ returnValue QProblemB::addBound(int number, SubjectToStatus B_status,
 }
 
 returnValue QProblemB::removeBound(int number, bool updateCholesky) {
-  int i, ii;
-  int nFR = getNFR();
+  const int nFR = getNFR();
 
   /* consistency check */
   if ((getStatus() == QPS_NOTINITIALISED) ||
@@ -695,18 +694,18 @@ returnValue QProblemB::removeBound(int number, bool updateCholesky) {
   /* 1) Calculate new column of cholesky decomposition. */
   real_t r0 = H[number * nV + number];
 
-  for (i = 0; i < nFR; ++i) {
-    ii = FR_idx[i];
+  for (int i = 0; i < nFR; ++i) {
+    const int ii = FR_idx[i];
     rhs[i] = H[number * nV + ii];
   }
 
   if (backsolveR(rhs.data(), true, true, r.data()) != SUCCESSFUL_RETURN)
     return THROWERROR(RET_REMOVEBOUND_FAILED);
 
-  for (i = 0; i < nFR; ++i) r0 -= r[i] * r[i];
+  for (int i = 0; i < nFR; ++i) r0 -= r[i] * r[i];
 
   /* 2) Store new column into R. */
-  for (i = 0; i < nFR; ++i) R[i * nV + nFR] = r[i];
+  for (int i = 0; i < nFR; ++i) R[i * nV + nFR] = r[i];
 
   if (r0 > 0.0)
     R[nFR * nV + nFR] = sqrt(r0);

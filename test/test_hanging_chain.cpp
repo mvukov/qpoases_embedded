@@ -75,12 +75,7 @@ TEST_P(TestHangingChain, ProcessTestData) {
   }
 }
 
-#ifdef INSTANTIATE_TEST_SUITE_P
 INSTANTIATE_TEST_SUITE_P(HangingChainTests, TestHangingChain,
                          ::testing::ValuesIn(qp_test_data_vectors));
-#else
-INSTANTIATE_TEST_CASE_P(HangingChainTests, TestHangingChain,
-                        ::testing::ValuesIn(qp_test_data_vectors), );
-#endif  // INSTANTIATE_TEST_SUITE_P
 
 }  // namespace qpoases_embedded

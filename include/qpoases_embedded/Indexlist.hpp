@@ -40,7 +40,7 @@ class Indexlist {
    */
  public:
   Indexlist() = delete;
-  Indexlist(int physicallength);
+  explicit Indexlist(int physicallength);
 
   void reset();
 
