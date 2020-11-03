@@ -1,6 +1,7 @@
 # qpQOASES embedded
 
 [![CircleCI](https://circleci.com/gh/mvukov/qpoases_embedded.svg?style=svg)](https://circleci.com/gh/mvukov/qpoases_embedded)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmvukov%2Fqpoases_embedded.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmvukov%2Fqpoases_embedded?ref=badge_shield)
 
 This is an unofficial fork of [qpOASES](https://github.com/coin-or/qpOASES)
 QP solver. The starting point was the embedded version of the solver that
@@ -17,3 +18,7 @@ Results of refactoring:
 - Printing is pulled out of the solver. User can provide callbacks to get info
   during solver execution.
 - Dead and rarely used code has been removed.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmvukov%2Fqpoases_embedded.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmvukov%2Fqpoases_embedded?ref=badge_large)
