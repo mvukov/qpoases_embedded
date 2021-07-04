@@ -30,8 +30,6 @@
 
 namespace qpoases_embedded {
 
-#ifdef QPOASES_DEBUG
-
 /** Prints concise information on the current iteration. Use with QProblemB.
  *  \returns Always returns true. */
 bool printIterationB(int iteration, /**< Number of current iteration. */
@@ -109,8 +107,6 @@ returnValue print(const int* const index, /**< Index array to be printed. */
                   int n,                  /**< Length of index array. */
                   const char* name        /**< Name of index array. */
 );
-
-#endif /* QPOASES_DEBUG */
 
 }  // namespace qpoases_embedded
 

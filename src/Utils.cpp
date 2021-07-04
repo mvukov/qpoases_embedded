@@ -24,8 +24,6 @@
 
 #include <qpoases_embedded/Utils.hpp>
 
-#ifdef QPOASES_DEBUG
-
 #include <cassert>
 #include <cstdio>
 
@@ -217,8 +215,6 @@ returnValue print(const int* const index, int n, const char* name) {
 }
 
 }  // namespace qpoases_embedded
-
-#endif /* QPOASES_DEBUG */
 
 /*
  *  end of file
