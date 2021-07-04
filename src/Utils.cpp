@@ -216,9 +216,9 @@ returnValue print(const int* const index, int n, const char* name) {
   return print(index, n);
 }
 
-#endif /* QPOASES_DEBUG */
-
 }  // namespace qpoases_embedded
+
+#endif /* QPOASES_DEBUG */
 
 /*
  *  end of file
