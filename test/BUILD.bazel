@@ -1,0 +1,111 @@
+""" Defines tests and benchmarks.
+"""
+
+load("//test:data_generator.bzl", "data_generator")
+load("@qpoases_embedded_pip_deps//:requirements.bzl", "requirement")
+
+py_binary(
+    name = "chain_mass_nmpc",
+    srcs = [
+        "chain_mass_nmpc.py",
+        "common.py",
+    ],
+    deps = [
+        requirement("casadi"),
+        requirement("numpy"),
+    ],
+)
+
+py_binary(
+    name = "hanging_chain",
+    srcs = [
+        "hanging_chain.py",
+        "common.py",
+    ],
+    deps = [
+        requirement("casadi"),
+        requirement("numpy"),
+    ],
+)
+
+data_generator(
+    name = "chain_mass_nmpc_data_generator",
+    generator = ":chain_mass_nmpc",
+    output = "include/qpoases_embedded/chain_mass_nmpc_test_data.h"
+)
+
+data_generator(
+    name = "hanging_chain_data_generator",
+    generator = ":hanging_chain",
+    output = "include/qpoases_embedded/hanging_chain_test_data.h"
+)
+
+cc_test(
+    name = "tests",
+    srcs = [
+        "test_chain_mass_nmpc.cpp",
+        "test_example1.cpp",
+        "test_example1b.cpp",
+        "test_hanging_chain.cpp",
+        "test_helpers.h",
+        ":chain_mass_nmpc_data_generator",
+        ":hanging_chain_data_generator",
+    ],
+    includes = ["include"],
+    copts = [
+        "-std=c++17",
+        "-Wall", "-Wextra", "-Wpedantic", "-Wfloat-equal", "-Werror",
+    ],
+    deps = [
+        "//:qpoases_embedded",
+        "//:utils",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "benchmark_helpers",
+    hdrs = ["benchmark_helpers.h"],
+    deps = ["@com_github_google_benchmark//:benchmark"],
+)
+
+cc_binary(
+    name = "benchmark_chain_mass_nmpc",
+    srcs = [
+        "benchmark_chain_mass_nmpc.cpp",
+        ":chain_mass_nmpc_data_generator",
+    ],
+    includes = ["include"],
+    copts = [
+        "-std=c++17",
+        "-Wall", "-Wextra", "-Wpedantic", "-Wfloat-equal", "-Werror",
+    ],
+    deps = [
+        ":benchmark_helpers",
+        "//:qpoases_embedded",
+        "@com_github_google_benchmark//:benchmark",
+    ],
+)
+
+cc_binary(
+    name = "benchmark_hanging_chain",
+    srcs = [
+        "benchmark_hanging_chain.cpp",
+        ":hanging_chain_data_generator",
+    ],
+    includes = ["include"],
+    copts = [
+        "-std=c++17",
+        "-Wall", "-Wextra", "-Wpedantic", "-Wfloat-equal", "-Werror",
+    ],
+    deps = [
+        ":benchmark_helpers",
+        "//:qpoases_embedded",
+        "@com_github_google_benchmark//:benchmark",
+    ],
+)
+
+exports_files([
+    "deps.bzl",
+    "repositories.bzl",
+])

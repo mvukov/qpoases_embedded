@@ -1,0 +1,77 @@
+""" Builds qpoases_embedded.
+"""
+
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
+bool_flag(
+    name = "debug",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "debug_on",
+    flag_values = {":debug": "True"},
+)
+
+_HEADERS = [
+    "include/qpoases_embedded/Bounds.hpp",
+    "include/qpoases_embedded/Bounds.ipp",
+    "include/qpoases_embedded/Constants.hpp",
+    "include/qpoases_embedded/Constraints.hpp",
+    "include/qpoases_embedded/Constraints.ipp",
+    "include/qpoases_embedded/Indexlist.hpp",
+    "include/qpoases_embedded/Indexlist.ipp",
+    "include/qpoases_embedded/MessageHandling.hpp",
+    "include/qpoases_embedded/QProblem.hpp",
+    "include/qpoases_embedded/QProblem.ipp",
+    "include/qpoases_embedded/QProblemB.hpp",
+    "include/qpoases_embedded/QProblemB.ipp",
+    "include/qpoases_embedded/SubjectTo.hpp",
+    "include/qpoases_embedded/SubjectTo.ipp",
+    "include/qpoases_embedded/Types.hpp",
+]
+
+cc_binary(
+    name = "qpoases_embedded_shared",
+    srcs = [
+        "src/Bounds.cpp",
+        "src/Constraints.cpp",
+        "src/Indexlist.cpp",
+        "src/MessageHandling.cpp",
+        "src/QProblem.cpp",
+        "src/QProblemB.cpp",
+        "src/SubjectTo.cpp",
+    ] + _HEADERS,
+    includes = ["include"],
+    defines = select({
+        ":debug_on": ["QPOASES_DEBUG"],
+        "//conditions:default": [],
+    }),
+    copts = [
+        "-std=c++17",
+        "-Wall", "-Wextra", "-Wpedantic", "-Wfloat-equal", "-Werror",
+    ],
+    linkshared = True,
+)
+
+cc_library(
+    name = "qpoases_embedded",
+    hdrs = _HEADERS,
+    includes = ["include"],
+    srcs = [":qpoases_embedded_shared"],
+    linkstatic = True,
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "utils",
+    srcs = ["src/Utils.cpp"],
+    hdrs = ["include/qpoases_embedded/Utils.hpp"],
+    includes = ["include"],
+    copts = [
+        "-std=c++17",
+        "-Wall", "-Wextra", "-Wpedantic", "-Wfloat-equal", "-Werror",
+    ],
+    deps = [":qpoases_embedded"],
+    visibility = ["//visibility:public"],
+)

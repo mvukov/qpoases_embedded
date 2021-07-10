@@ -24,9 +24,8 @@
 
 #include <qpoases_embedded/MessageHandling.hpp>
 #include <qpoases_embedded/QProblem.hpp>
-#include <qpoases_embedded/Utils.hpp>
 
-#include "qpoases_embedded/hanging_chain_benchmark_data.h"
+#include "qpoases_embedded/hanging_chain_test_data.h"
 
 #include "./benchmark_helpers.h"
 
