@@ -26,6 +26,13 @@
 
 #include <map>
 
+#ifdef QPOASES_DEBUG
+
+#include <cstdarg>
+#include <cstdio>
+
+#endif  // QPOASES_DEBUG
+
 namespace qpoases_embedded {
 
 static const std::map<returnValue, std::string> returnValueErrorToString = {
@@ -176,8 +183,6 @@ const std::string& getErrorString(returnValue error) {
 }
 
 #ifdef QPOASES_DEBUG
-
-#include <cstdio>
 
 namespace internal {
 

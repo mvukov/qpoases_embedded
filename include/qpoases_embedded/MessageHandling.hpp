@@ -35,6 +35,8 @@ const std::string& getErrorString(returnValue error);
 
 #ifdef QPOASES_DEBUG
 
+#include <string.h>
+
 namespace internal {
 
 enum class MsgType { kInfo, kError };
