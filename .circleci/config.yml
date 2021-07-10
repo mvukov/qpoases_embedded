@@ -2,13 +2,10 @@ version: 2
 jobs:
   build:
     docker:
-      - image: mvukov/qpoases-embedded-ci:latest
+      - image: mvukov/bazel-builder:latest
     steps:
-      - checkout:
-          path: src
+      - checkout
       - run:
           name: Build & Test
           command: |
-            colcon build --event-handlers status- console_cohesion+ --cmake-args -DBUILD_TESTING:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Debug
-            colcon test --event-handlers status- console_cohesion+
-            colcon test-result --all
+            bazel test -c dbg //...
