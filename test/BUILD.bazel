@@ -104,8 +104,3 @@ cc_binary(
         "@com_github_google_benchmark//:benchmark",
     ],
 )
-
-exports_files([
-    "deps.bzl",
-    "repositories.bzl",
-])

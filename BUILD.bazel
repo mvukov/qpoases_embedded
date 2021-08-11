@@ -75,3 +75,8 @@ cc_library(
     deps = [":qpoases_embedded"],
     visibility = ["//visibility:public"],
 )
+
+exports_files([
+    "deps.bzl",
+    "repositories.bzl",
+])
